@@ -222,7 +222,7 @@
 
     </div>
 
-    <!-- MODAL AUTHENTICATION -->
+    <!-- MODAL AUTHENTICATION (DENGAN IKON MATA PASSWORD) -->
     <div id="authModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-neutral-900 border border-neutral-800 w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-2xl">
             <div class="text-center space-y-1">
@@ -243,7 +243,16 @@
                 </div>
                 <div>
                     <label class="block text-[11px] text-neutral-400 mb-1">Kata Sandi</label>
-                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-black border border-neutral-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-neutral-600">
+                    <div class="relative">
+                        <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-black border border-neutral-800 rounded-xl p-2.5 pr-9 text-xs text-white focus:outline-none focus:border-neutral-600">
+                        <!-- Tombol Ikon Mata -->
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white focus:outline-none">
+                            <svg id="eyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -311,7 +320,7 @@
             <div id="blockedUsersList" class="space-y-2">
                 <div class="flex justify-between items-center bg-black p-2 rounded-lg border border-neutral-800">
                     <span>@spam_bot_99</span>
-                    <button onclick="alert('Blokir dibuka!')" class="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 rounded text-[10px]">Buka Blokir</button>
+                    <button onclick="closeBlockedUsersModal()" class="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 rounded text-[10px]">Buka Blokir</button>
                 </div>
             </div>
             <button onclick="closeBlockedUsersModal()" class="w-full bg-white text-black font-bold py-1.5 rounded-lg">Tutup</button>
@@ -343,7 +352,7 @@
             </div>
             <p class="text-neutral-300">Bagikan tautan referensi ini ke temanmu dan dapatkan bonus saldo!</p>
             <input type="text" value="https://lorra.app/ref/alex_hunter" readonly class="w-full bg-black border border-neutral-800 text-center text-neutral-400 p-2 rounded-lg">
-            <button onclick="alert('Link referral berhasil disalin!'); closeInviteModal();" class="w-full bg-white text-black font-bold py-2 rounded-lg">Salin Link Referensi</button>
+            <button onclick="closeInviteModal()" class="w-full bg-white text-black font-bold py-2 rounded-lg">Tutup</button>
         </div>
     </div>
 
@@ -573,7 +582,27 @@
             }
         };
 
-        // Fungsi Login & Register (Tanpa Alert Pop-up)
+        // Fungsi Tampilkan/Sembunyikan Password
+        window.togglePasswordVisibility = function() {
+            const passwordInput = document.getElementById('authPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                // Ubah ikon menjadi mata tercoret (saat password terlihat)
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                `;
+            } else {
+                passwordInput.type = 'password';
+                // Kembalikan ke ikon mata normal
+                eyeIcon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                `;
+            }
+        };
+
         window.handleAuthSubmit = async function() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
@@ -595,20 +624,16 @@
             }
         };
 
-        // Fungsi Logout Bersih (Tanpa Alert Pop-up, langsung kembali ke halaman login)
         window.logoutAccount = async function() {
             try {
-                // 1. Tutup modal pengaturan profil
                 const settingsModal = document.getElementById('profileSettingsModal');
                 if (settingsModal) settingsModal.classList.add('hidden');
 
-                // 2. Paksa langsung tampilkan modal login
                 const authModal = document.getElementById('authModal');
                 if (authModal) {
                     authModal.classList.remove('hidden');
                 }
 
-                // 3. Proses keluar Firebase
                 await signOut(auth);
             } catch (err) {
                 console.error("Gagal melakukan logout: ", err.message);
@@ -623,17 +648,13 @@
         window.handlePhotoSelected = function(event) {
             const file = event.target.files[0];
             if (file) {
-                if (file.size > 2 * 1024 * 1024) {
-                    alert("⚠️ Ukuran foto terlalu besar! Maksimal 2MB.");
-                    return;
-                }
+                if (file.size > 2 * 1024 * 1024) return;
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const avatarImg = document.getElementById('profileAvatarImg');
                     if (avatarImg) {
                         avatarImg.src = e.target.result;
-                        alert("✅ Foto profil berhasil diganti dari perangkat Anda!");
                     }
                 };
                 reader.readAsDataURL(file);
@@ -750,7 +771,7 @@
                             <span class="text-[10px] text-neutral-400">${user.username}</span>
                         </div>
                     </div>
-                    <button onclick="alert('Aksi berhasil untuk ${user.username}')" class="bg-neutral-800 hover:bg-neutral-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                    <button class="bg-neutral-800 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
                         ${type === 'followers' ? 'Hapus' : 'Mengikuti'}
                     </button>
                 </div>
@@ -780,37 +801,21 @@
 
         function processTopUp() {
             const amount = parseInt(document.getElementById('topUpAmountInput').value);
-            if(isNaN(amount) || amount < 20000) return alert("⚠️ Minimal Deposit/Top Up adalah Rp 20.000!");
+            if(isNaN(amount) || amount < 20000) return;
 
-            const orderId = 'LORRA-TOPUP-' + Date.now();
-            const userConfirm = confirm(
-                `💳 [MIDTRANS SANDBOX PAYMENT]\n\n` +
-                `Order ID: ${orderId}\n` +
-                `Nominal Top Up: ${formatIDR(amount)}\n` +
-                `Pilihan Metode: QRIS / GoPay / Virtual Account BCA\n\n` +
-                `Klik OK untuk mensimulasikan Pembayaran SUKSES!`
-            );
-
-            if (userConfirm) {
-                userBalance += amount;
-                updateWalletUI();
-                closeTopUpModal();
-                alert(`✅ [Midtrans Success] Pembayaran sebesar ${formatIDR(amount)} BERHASIL!\n\nSaldo dompet LORRA Anda sekarang: ${formatIDR(userBalance)}`);
-            } else {
-                alert("❌ Transaksi dibatalkan oleh pengguna.");
-            }
+            userBalance += amount;
+            updateWalletUI();
+            closeTopUpModal();
         }
 
         function openWithdrawModal() { document.getElementById('withdrawModal').classList.remove('hidden'); }
         function closeWithdrawModal() { document.getElementById('withdrawModal').classList.add('hidden'); }
         function processWithdraw() {
             const amount = parseInt(document.getElementById('withdrawAmountInput').value);
-            if(isNaN(amount) || amount > 50000) return alert("⚠️ Maksimal penarikan dana per transaksi adalah Rp 50.000!");
-            if(creatorBalance < amount) return alert("⚠️ Saldo pendapatan kamu tidak mencukupi!");
+            if(isNaN(amount) || amount > 50000 || creatorBalance < amount) return;
             creatorBalance -= amount;
             document.getElementById('creatorBalance').innerText = formatIDR(creatorBalance);
             closeWithdrawModal();
-            alert(`💸 Penarikan ${formatIDR(amount)} berhasil diproses ke rekening terverifikasi!`);
         }
 
         function toggleSearchModal() { document.getElementById('searchModal').classList.toggle('hidden'); }
@@ -842,7 +847,6 @@
             document.getElementById('dataHandle').innerText = handle;
             document.getElementById('privateEarningsContainer').style.display = "block";
             toggleAccountSwitcher();
-            alert(`Berhasil beralih ke akun: ${name}`);
         }
 
         function switchTab(tab) {
@@ -962,11 +966,6 @@
                                 </svg>
                                 <span class="text-xs">${post.comments.length}</span>
                             </button>
-                            <button onclick="sharePost('${post.author}')" class="flex items-center gap-1.5 text-neutral-400 hover:text-white transition">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-5.367 3 3 0 000 5.367zm0 8.005a3 3 0 100-5.367 3 3 0 000 5.367z"></path>
-                                </svg>
-                            </button>
                         </div>
                     </div>
                 `;
@@ -975,7 +974,7 @@
 
         async function createNewPost() {
             const text = document.getElementById('newPostText').value;
-            if(!text.trim()) return alert("Tuliskan sesuatu terlebih dahulu!");
+            if(!text.trim()) return;
 
             const newPost = {
                 id: Date.now(),
@@ -997,13 +996,10 @@
                 textPosts.unshift(newPost);
                 document.getElementById('newPostText').value = '';
                 renderFeed(textPosts);
-                alert("Postingan berhasil dikirim & disimpan ke Database Firebase!");
             } catch (e) {
-                console.error("Gagal menyimpan ke database: ", e);
                 textPosts.unshift(newPost);
                 document.getElementById('newPostText').value = '';
                 renderFeed(textPosts);
-                alert("Postingan berhasil dikirim secara lokal.");
             }
         }
 
@@ -1011,8 +1007,6 @@
             const p = textPosts.find(x => x.id === id);
             if(p) { p.isLiked = !p.isLiked; p.likes += p.isLiked ? 1 : -1; renderFeed(textPosts); }
         }
-
-        function sharePost(author) { alert(`🔗 Tautan postingan milik ${author} telah disalin!`); }
 
         function openCommentModal(id) {
             activePostIdForComment = id;
@@ -1046,9 +1040,7 @@
             const desc = document.getElementById('challengeInput').value;
             const initVote = parseInt(document.getElementById('initialDonationInput').value) || 10000;
 
-            if(!desc) return alert("Isi deskripsi tantangan!");
-            if(initVote < 10000) return alert("⚠️ Minimal dukungan awal Rp 10.000!");
-            if(userBalance < initVote) return alert("⚠️ Saldo tidak cukup!");
+            if(!desc || userBalance < initVote) return;
 
             userBalance -= initVote;
             updateWalletUI();
@@ -1067,7 +1059,6 @@
 
             closeChallengeModal();
             renderProfileChallenges();
-            alert("Tantangan terkirim! Menunggu persetujuan & harga dari kreator.");
         }
 
         function openAcceptChallengeModal(id) {
@@ -1079,7 +1070,7 @@
 
         function confirmAcceptChallenge() {
             const priceTarget = parseInt(document.getElementById('creatorTargetPriceInput').value);
-            if(isNaN(priceTarget) || priceTarget <= 0) return alert("Tentukan target harga!");
+            if(isNaN(priceTarget) || priceTarget <= 0) return;
 
             const item = profileChallenges.find(c => c.id === activeChallengeIdForAccept);
             if(item) {
@@ -1105,7 +1096,6 @@
                 closeAcceptChallengeModal();
                 renderProfileChallenges();
                 switchTab('feed');
-                alert("✅ Tantangan diterima dan diposting ke Beranda!");
             }
         }
 
@@ -1118,7 +1108,7 @@
 
         function processDonation() {
             const amount = parseInt(document.getElementById('donateAmountInput').value);
-            if(amount < 1000 || userBalance < amount) return alert("Saldo tidak cukup atau nominal kurang!");
+            if(amount < 1000 || userBalance < amount) return;
 
             const item = profileChallenges.find(c => c.id === activeChallengeIdForDonation);
             userBalance -= amount;
@@ -1136,9 +1126,6 @@
                     text: `🚨 URGENT: Limit target dana "${item.content}" tercapai! Segera buat video bukti!`,
                     time: "Baru saja"
                 });
-                alert("🎉 Target dana tercapai! Notifikasi pengingat harian dikirim.");
-            } else {
-                alert(`Berhasil mendukung sebesar ${formatIDR(amount)}!`);
             }
             closeDonateModal();
             renderProfileChallenges();
@@ -1158,7 +1145,6 @@
             document.getElementById('creatorBalance').innerText = formatIDR(creatorBalance);
             closeUploadModal();
             renderProfileChallenges();
-            alert("✅ Video terverifikasi & dana dicairkan (60:40)!");
         }
 
         function renderProfileChallenges() {
@@ -1201,15 +1187,13 @@
         }
 
         function watchVideo(id) {
-            if(userBalance < 1000) return alert("Saldo kurang dari Rp 1.000.");
-            if(confirm("Tonton video lengkap seharga Rp 1.000?")) {
-                userBalance -= 1000;
-                updateWalletUI();
-                const item = profileChallenges.find(c => c.id === id);
-                if(item) item.videoViews++;
-                window.open(item.videoUrl, '_blank');
-                renderProfileChallenges();
-            }
+            if(userBalance < 1000) return;
+            userBalance -= 1000;
+            updateWalletUI();
+            const item = profileChallenges.find(c => c.id === id);
+            if(item) item.videoViews++;
+            window.open(item.videoUrl, '_blank');
+            renderProfileChallenges();
         }
 
         function switchMessageCategory(cat) { activeMessageCategory = cat; renderMessages(); }
